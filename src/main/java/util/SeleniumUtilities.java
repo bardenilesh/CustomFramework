@@ -64,10 +64,6 @@ public class SeleniumUtilities {
 
 	public static String password;
 
-	public static String homePageTitle;
-
-	public static String loginPageTitle;
-
 	public boolean acceptNextAlert = true;
 
 	static SoftAssert as = new SoftAssert();
@@ -86,8 +82,6 @@ public class SeleniumUtilities {
 			Global.baseURL = appUrl;
 			userName = prop.getProperty("USERNAME");
 			password = prop.getProperty("PASSWORD");
-			homePageTitle = prop.getProperty("homePageTitle");
-			loginPageTitle = prop.getProperty("loginPageTitle");
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
@@ -207,6 +201,17 @@ public class SeleniumUtilities {
 		}
 		return field;
 	}
+	
+	public WebElement findElement(By by)
+			throws NoSuchElementException, IOException {
+		WebElement field = null;
+		try {
+			field = webDriver.findElement(by);
+		} catch (NoSuchElementException ex) {
+			log.warn("Unable to find an element");
+		}
+		return field;
+	}
 
 	public List<WebElement> findElements(String locatorType, String value)
 			throws NoSuchElementException {
@@ -283,6 +288,18 @@ public class SeleniumUtilities {
 		}
 	}
 	
+	public void enterText(By by, String text) {
+
+		try {
+			WebElement element= webDriver.findElement(by);
+			element.sendKeys(text);
+			wait(100);
+			element = null;
+		} catch (Exception e) {
+			log.warn("No Element Found to enter text");
+		}
+	}
+	
 	public void enterText(WebElement element, Keys text) {
 
 		try {
@@ -317,6 +334,16 @@ public class SeleniumUtilities {
 			log.warn("No Element Found to click with: " + element );
 		}
 	}
+	
+	public void clickOnElement(By by) {
+		try {
+			WebElement element = findElement(by);
+			element.click();
+			wait(1000);
+		} catch (Exception e) {
+			log.warn("No Element Found to click with: " + by );
+		}
+	}
 
 	public String getTextFromWebElement(String locatorType, String value)
 			throws Exception {
@@ -338,6 +365,21 @@ public class SeleniumUtilities {
 			throws Exception {
 		String gettext=null;
 		try {
+			gettext = element.getText();
+			log.info("Element text is: " + gettext);
+
+		} catch (NoSuchElementException e) {
+			log.warn("No element with name " + element + "was found.");
+		}
+		return gettext;
+	}
+	
+	public String getTextFromWebElement(By by)
+			throws Exception {
+		WebElement element=null;
+		String gettext=null;
+		try {
+			element = findElement(by);
 			gettext = element.getText();
 			log.info("Element text is: " + gettext);
 
@@ -596,7 +638,7 @@ public class SeleniumUtilities {
 		} catch (NoSuchElementException e) {
 			log.warn("Element is NOT present" + locatorType + ":" + value
 					+ ", So returning true as per the check");
-			isElementPresent = true;
+			isElementPresent = false;
 		}
 		return isElementPresent;
 
@@ -920,6 +962,20 @@ public class SeleniumUtilities {
 			log.error("Unable to find an element");
 		}
 	}
+	
+	public void clearAndEnterText(By by , String text)
+			throws Exception {
+		WebElement element=null;
+		try {
+			element=findElement(by);
+			element.click();
+			element.clear();
+			wait(1000);
+			element.sendKeys(text);
+		} catch (NoSuchElementException ex) {
+			log.error("Unable to find an element");
+		}
+	}
 
 	public void selectTextFromDropDown(String locatorType, String value,
 			String text) throws Exception {
@@ -938,6 +994,17 @@ public class SeleniumUtilities {
 	public void selectTextFromDropDown(WebElement element, String text) throws Exception {
 		try {
 			Select sel = new Select(element);
+			sel.selectByVisibleText(text);
+			wait(1000);
+		} catch (NoSuchElementException ex) {
+			log.error("Unable to find an element");
+			ex.printStackTrace();
+		}
+	}
+	
+	public void selectTextFromDropDown(By by, String text) throws Exception {
+		try {
+			Select sel = new Select(findElement(by));
 			sel.selectByVisibleText(text);
 			wait(1000);
 		} catch (NoSuchElementException ex) {
