@@ -16,12 +16,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 
 public class LoginTest extends SeleniumUtilities{
+	static Logger log = Logger.getLogger(LoginTest.class.getName());
 	ExcelUtility oExcel= new ExcelUtility();
 	WebDriver driver;
   @Test (priority=0)
@@ -34,12 +36,14 @@ public class LoginTest extends SeleniumUtilities{
 		enterText(HomePage.txtBox_Password, prop.getProperty("PASSWORD"));
 		clickOnElement(HomePage.btn_SignIn);
 		wait(4000);
+		log.info("Successfully Logged In");
 		Assert.assertEquals(getTextFromWebElement(MyAccount.link_Sign_Out), "Sign out");
   }
   
   @Test (priority=1, dependsOnMethods="login")
 	public void addToCart() throws Exception {
 		clickOnElement(MyAccount.link_Women);
+		log.info("Successfully cliked on Women link");
 		clickOnElement(MyAccount.chkBx_Top);
 		clickOnElement(MyAccount.chkBx_Size_Small);
 		selectTextFromDropDown(MyAccount.drp_Product_Sort_By, oExcel.get("productsorting"));
